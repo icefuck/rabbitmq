@@ -19,12 +19,13 @@ public class Send {
 		Channel channel = connection.createChannel();
 
 		channel.queueDeclare(QUEUE_NAME,false,false,false,null);
-
+		channel.basicQos(1);
 		for(int i=0;i<50;i++){
 			String msg = "hello work queue"+i;
-			channel.basicPublish("",QUEUE_NAME,null,msg.getBytes());
 			System.out.println("[WQ ]send:"+msg);
-			Thread.sleep(i*2);
+			channel.basicPublish("",QUEUE_NAME,null,msg.getBytes());
+
+			Thread.sleep(i*5);
 		}
 		channel.close();
 		connection.close();

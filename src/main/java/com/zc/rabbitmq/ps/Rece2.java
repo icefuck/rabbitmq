@@ -1,4 +1,4 @@
-package com.zc.rabbitmq.workfair;
+package com.zc.rabbitmq.ps;
 
 import com.rabbitmq.client.*;
 import com.zc.rabbitmq.util.ConnectionUtils;
@@ -7,18 +7,19 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Created by zhangchuang on 2018/10/22.
+ * Created by zhangchuang on 2018/10/24.
  * Description:
  */
-public class Receive2 {
-	private static final String QUEUE_NAME = "test_work_queue";
-	public static void  main(String[] args) throws IOException, TimeoutException {
+public class Rece2 {
+	private static final String QUEUE_NAME = "test_fanout_queue";
+	private static final String EXCHANGE_NAME= "test_exchange_fanout";
+	public static void main(String[] args) throws IOException, TimeoutException {
 		Connection connection = ConnectionUtils.getConnection();
-
 		final Channel channel = connection.createChannel();
-
 		channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+		channel.queueBind(QUEUE_NAME,EXCHANGE_NAME,"");
 		channel.basicQos(1);
+
 		Consumer consumer = new DefaultConsumer(channel){
 			@Override
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
@@ -33,6 +34,10 @@ public class Receive2 {
 				}
 			}
 		};
-		channel.basicConsume(QUEUE_NAME,false,consumer);
+
+		Boolean ack = false;
+		channel.basicConsume(QUEUE_NAME,ack,consumer);
+
 	}
+
 }
